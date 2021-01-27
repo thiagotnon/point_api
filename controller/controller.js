@@ -2,17 +2,30 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const models = require('../models');
-const { request } = require('http');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 
 const user = models.User;
 const tracking = models.Tracking;
 const product = models.Product;
 
-app.post('/create', async (request, response) => {
+app.post('/login', async (request, response) => {
+
+  const login = await user.findOne({
+    where: { name: request.body.name, password: request.body.password }
+  });
+  if (login === null) {
+    response.send(JSON.stringify('error'));
+  } else {
+    response.send(login);
+  }
+});
+
+/* app.post('/create', async (request, response) => {
   const create = await user.create({
     name: 'Thiago',
     password: 'abc',
@@ -43,7 +56,7 @@ app.delete('/delete', async (request, response) => {
   user.destroy({
     where: { id: 1 }
   });
-});
+}); */
 
 const port = process.env.PORT || 3000;
 app.listen(port, (request, response) => {
